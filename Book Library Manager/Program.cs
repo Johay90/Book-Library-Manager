@@ -1,4 +1,7 @@
 using Book_Library_Manager.Data;
+using Book_Library_Manager.Data.Repositories;
+using Book_Library_Manager.Interfaces;
+using Book_Library_Manager.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<BookLibraryManagerContext>();
+
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IBookService, BookService>();
 
 var app = builder.Build();
 
