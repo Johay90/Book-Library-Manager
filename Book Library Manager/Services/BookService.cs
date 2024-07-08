@@ -21,9 +21,21 @@ namespace Book_Library_Manager.Services
             _validator = validator;
         }
 
-        public Task<Result<BookDto>> AddBook(CreateBookDto book)
+        public async Task<Result<BookDto>> AddBook(CreateBookDto createDto)
         {
-            throw new NotImplementedException();
+            var bookDtoForValidation = _mapper.Map<BookDto>(createDto);
+
+            var validationResult = await _validator.ValidateAsync(bookDtoForValidation);
+            if (!validationResult.IsValid)
+            {
+                return Result.Invalid(validationResult.AsErrors());
+            }
+
+            var newBookEntity = _mapper.Map<Book>(createDto);
+            var addedBook = await _bookRepository.AddBook(newBookEntity);
+
+            var addedBookDto = _mapper.Map<BookDto>(addedBook);
+            return Result.Success(addedBookDto);
         }
 
         public Task<Result<BookDto>> CheckOutBook(Guid id, string borrower)
@@ -31,9 +43,18 @@ namespace Book_Library_Manager.Services
             throw new NotImplementedException();
         }
 
-        public Task<Result> DeleteBook(Guid Id)
+        public async Task<Result> DeleteBook(Guid Id)
         {
-            throw new NotImplementedException();
+            var entity = await _bookRepository.GetBookById(Id);
+
+            if (entity is null)
+            {
+                return Result.NotFound();
+            }
+
+            await _bookRepository.DeleteBook(Id);
+
+            return Result.Success();
         }
 
         public async Task<Result<IEnumerable<BookDto>>> GetAllBooks()

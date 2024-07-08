@@ -74,14 +74,14 @@ namespace Book_Library_Manager.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<CreateBookDto>> PostBook([FromBody] CreateBookDto book)
         {
-            if (!ModelState.IsValid) // TODO annotate model
+            var result = await _bookService.AddBook(book);
+
+            if (!result.IsSuccess)
             {
-                return BadRequest(ModelState);
+                if (result.IsInvalid()) return BadRequest(result.Errors);
             }
 
-            var newBook = await _bookService.AddBook(book);
-
-            return CreatedAtAction(nameof(GetBook), new { id = newBook.Value.Id }, newBook);
+            return CreatedAtAction(nameof(GetBook), new { id = result.Value.Id }, result.Value);
         }
 
         // DELETE: api/Books/5
@@ -90,13 +90,11 @@ namespace Book_Library_Manager.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteBook(Guid id)
         {
-            var book = await _bookService.GetBookById(id);
-            if (book is null)
+            var result = await _bookService.DeleteBook(id);
+            if (!result.IsSuccess)
             {
-                return NotFound();
+                 if (result.IsNotFound()) return NotFound();
             }
-
-            await _bookService.DeleteBook(id);
 
             return NoContent();
         }
