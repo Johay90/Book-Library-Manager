@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Book_Library_Manager.Interfaces;
 using Book_Library_Manager.Core.Models.DTOs;
+using Ardalis.Result;
 
 namespace Book_Library_Manager.Controllers
 {
@@ -21,14 +22,14 @@ namespace Book_Library_Manager.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
         {
-            var books = await _bookService.GetAllBooks();
+            var result = await _bookService.GetAllBooks();
 
-            if (!books.Any())
+            if (!result.IsSuccess)
             {
                 return NoContent();
             }
 
-            return Ok(books);
+            return Ok(result.Value);
         }
 
         // GET: api/Books/5
@@ -37,14 +38,14 @@ namespace Book_Library_Manager.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<BookDto>> GetBook(Guid id)
         {
-            var book = await _bookService.GetBookById(id);
+            var result = await _bookService.GetBookById(id);
 
-            if (book == null)
+            if (!result.IsSuccess)
             {
-                return NotFound();
+                if (result.IsNotFound()) return NotFound();
             }
 
-            return Ok(book);
+            return Ok(result.Value);
         }
 
         // PUT: api/Books/5
@@ -55,19 +56,13 @@ namespace Book_Library_Manager.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> PutBook(Guid id, [FromBody] UpdateBookDto book)
         {
-            var bookEsists = await _bookService.GetBookById(id);
+            var result = await _bookService.UpdateBook(id, book);
 
-            if (bookEsists is null)
+            if (!result.IsSuccess)
             {
-                return NotFound();
+                if (result.IsNotFound()) return NotFound();
+                if (result.IsInvalid()) return BadRequest(result.Errors);
             }
-
-            if (!ModelState.IsValid) // TODO annotate model
-            {
-                return BadRequest(ModelState);
-            }
-
-            await _bookService.UpdateBook(id, book);
 
             return NoContent();
         }
@@ -86,7 +81,7 @@ namespace Book_Library_Manager.Controllers
 
             var newBook = await _bookService.AddBook(book);
 
-            return CreatedAtAction(nameof(GetBook), new { id = newBook.Id }, newBook);
+            return CreatedAtAction(nameof(GetBook), new { id = newBook.Value.Id }, newBook);
         }
 
         // DELETE: api/Books/5

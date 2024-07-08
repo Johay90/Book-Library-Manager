@@ -1,59 +1,105 @@
-﻿using Book_Library_Manager.Core.Models.DTOs;
-using Book_Library_Manager.Data.Repositories;
+﻿using Ardalis.Result;
+using Ardalis.Result.FluentValidation;
+using AutoMapper;
+using Book_Library_Manager.Core.Models.Domain;
+using Book_Library_Manager.Core.Models.DTOs;
 using Book_Library_Manager.Interfaces;
+using FluentValidation;
 
 namespace Book_Library_Manager.Services
 {
     public class BookService : IBookService
     {
+        private readonly IMapper _mapper;
         private readonly IBookRepository _bookRepository;
+        private IValidator<BookDto> _validator;
 
-        public BookService(IBookRepository bookRepository)
+        public BookService(IBookRepository bookRepository, IMapper mapper, IValidator<BookDto> validator)
         {
             _bookRepository = bookRepository;
+            _mapper = mapper;
+            _validator = validator;
         }
 
-        public async Task<BookDto> AddBook(CreateBookDto book)
+        public Task<Result<BookDto>> AddBook(CreateBookDto book)
         {
             throw new NotImplementedException();
         }
 
-        public Task<BookDto> CheckOutBook(Guid id, string borrower)
+        public Task<Result<BookDto>> CheckOutBook(Guid id, string borrower)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteBook(Guid Id)
+        public Task<Result> DeleteBook(Guid Id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<BookDto>> GetAllBooks()
+        public async Task<Result<IEnumerable<BookDto>>> GetAllBooks()
+        {
+            var books = _mapper.Map<List<BookDto>>(await _bookRepository.GetAllBooks());
+
+            if (books.Any())
+            {
+                return Result.Success(books).Value;
+            }
+            else
+            {
+                return Result.NotFound();
+            }
+
+        }
+
+        public async Task<Result<BookDto>> GetBookById(Guid Id)
+        {
+            var books = _mapper.Map<BookDto>(await _bookRepository.GetBookById(Id));
+
+            if (books is not null)
+            {
+                return Result.Success(books).Value;
+            }
+            else
+            {
+                return Result.NotFound();
+            }
+        }
+
+        public Task<Result<IEnumerable<BookDto>>> ReturnBook(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<BookDto> GetBookById(Guid Id)
+        public Task<Result<IEnumerable<BookDto>>> SearchBooks(string query)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<BookDto>> ReturnBook(Guid id)
+        public async Task<Result<BookDto>> UpdateBook(Guid id, UpdateBookDto updateDto)
         {
-            throw new NotImplementedException();
+            var existingBook = await _bookRepository.GetBookById(id);
+            if (existingBook is null)
+            {
+                return Result.NotFound();
+            }
+
+            var bookDtoForValidation = _mapper.Map<BookDto>(updateDto);
+
+            var validationResult = await _validator.ValidateAsync(bookDtoForValidation);
+            if (!validationResult.IsValid)
+            {
+                return Result.Invalid(validationResult.AsErrors());
+            }
+
+            _mapper.Map(updateDto, existingBook);
+
+            await _bookRepository.UpdateBook(existingBook);
+
+            var updatedBookDto = _mapper.Map<BookDto>(existingBook);
+            return Result.Success(updatedBookDto);
         }
 
-        public Task<IEnumerable<BookDto>> SearchBooks(string query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<BookDto> UpdateBook(Guid id, UpdateBookDto book)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<BookDto> UpdateReadingProgress(Guid id, float progress)
+        public Task<Result<BookDto>> UpdateReadingProgress(Guid id, float progress)
         {
             throw new NotImplementedException();
         }
