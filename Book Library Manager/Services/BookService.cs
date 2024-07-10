@@ -120,9 +120,23 @@ namespace Book_Library_Manager.Services
             return Result.Success(updatedBookDto);
         }
 
-        public Task<Result<BookDto>> UpdateReadingProgress(Guid id, float progress)
+        public async Task<Result<BookDto>> UpdateReadingProgress(Guid id, float progress)
         {
-            throw new NotImplementedException();
+
+            var existingBook = await _bookRepository.GetBookById(id);
+
+            if (existingBook is null)
+            {
+                return Result.NotFound();
+            }
+
+            existingBook.ReadingProgress = progress;
+
+            await _bookRepository.UpdateBookProgress(existingBook);
+
+            var updatedBookDto = _mapper.Map<BookDto>(existingBook);
+
+            return Result.Success(updatedBookDto);
         }
     }
 }

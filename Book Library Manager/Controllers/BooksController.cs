@@ -67,6 +67,21 @@ namespace Book_Library_Manager.Controllers
             return NoContent();
         }
 
+        [HttpPatch("{id}/progress")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> UpdateBookProgress(Guid id, [FromBody] float progress)
+        {
+            var result = await _bookService.UpdateReadingProgress(id, progress);
+
+            if (!result.IsSuccess)
+            {
+                if (result.IsNotFound()) return NotFound();
+            }
+
+            return NoContent();
+        }
+
         // POST: api/Books
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
