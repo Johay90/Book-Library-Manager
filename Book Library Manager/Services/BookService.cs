@@ -91,9 +91,18 @@ namespace Book_Library_Manager.Services
             throw new NotImplementedException();
         }
 
-        public Task<Result<IEnumerable<BookDto>>> SearchBooks(string query)
+        public async Task<Result<IEnumerable<BookDto>>> SearchBooks(string query)
         {
-            throw new NotImplementedException();
+            var books = await _bookRepository.SearchBooks(query);
+
+            if (!books.Any())
+            {
+                return Result.NotFound();
+            }
+
+            var result = _mapper.Map<IEnumerable<BookDto>>(books);
+
+            return Result.Success(result);
         }
 
         public async Task<Result<BookDto>> UpdateBook(Guid id, UpdateBookDto updateDto)

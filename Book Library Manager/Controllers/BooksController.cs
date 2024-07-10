@@ -48,6 +48,22 @@ namespace Book_Library_Manager.Controllers
             return Ok(result.Value);
         }
 
+        // GET: api/Books/search?query=programming
+        [HttpGet("search")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<BookDto>>> SearchBooks([FromQuery] string query)
+        {
+            var result = await _bookService.SearchBooks(query);
+
+            if (!result.IsSuccess)
+            {
+                if (result.IsNotFound()) return NotFound();
+            }
+
+            return Ok(result.Value);
+        }
+
         // PUT: api/Books/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -67,6 +83,7 @@ namespace Book_Library_Manager.Controllers
             return NoContent();
         }
 
+        // PATCH: api/Books/5/progress
         [HttpPatch("{id}/progress")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
