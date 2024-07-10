@@ -69,17 +69,22 @@ namespace Book_Library_Manager.Controllers
 
         [HttpPatch("{id}/progress")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> UpdateBookProgress(Guid id, [FromBody] float progress)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<BookDto>> UpdateBookProgress(Guid id, [FromBody] UpdateProgressDto progressDto)
         {
-            var result = await _bookService.UpdateReadingProgress(id, progress);
+            if (progressDto == null || !ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            var result = await _bookService.UpdateReadingProgress(id, progressDto.Progress);
             if (!result.IsSuccess)
             {
                 if (result.IsNotFound()) return NotFound();
             }
 
-            return NoContent();
+            return Ok(result.Value);
         }
 
         // POST: api/Books
@@ -108,7 +113,7 @@ namespace Book_Library_Manager.Controllers
             var result = await _bookService.DeleteBook(id);
             if (!result.IsSuccess)
             {
-                 if (result.IsNotFound()) return NotFound();
+                if (result.IsNotFound()) return NotFound();
             }
 
             return NoContent();
