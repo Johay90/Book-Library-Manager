@@ -11,8 +11,8 @@ namespace Book_Library_Manager.Interfaces
         public Task<Result<BookDto>> UpdateBook(Guid id, UpdateBookDto book);
         public Task<Result> DeleteBook(Guid Id);
         public Task<Result<IEnumerable<BookDto>>> SearchBooks(string query);
-        public Task<Result<BookDto>> CheckOutBook(Guid id, string borrower);
-        public Task<Result<IEnumerable<BookDto>>> ReturnBook(Guid id);
+        public Task<Result<BookDto>> CheckOutBook(Guid id, BorrowBookDto borrowDto);
+        public Task<Result<BookDto>> ReturnBook(Guid id);
         public Task<Result<BookDto>> UpdateReadingProgress(Guid id, float progress);
     }
 }

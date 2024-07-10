@@ -104,6 +104,46 @@ namespace Book_Library_Manager.Controllers
             return Ok(result.Value);
         }
 
+        // POST: api/Books/{id}/borrow
+        [HttpPost("{id}/borrow")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<BookDto>> BorrowBook(Guid id, [FromBody] BorrowBookDto borrowDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _bookService.CheckOutBook(id, borrowDto);
+            if (!result.IsSuccess)
+            {
+                if (result.Status == ResultStatus.NotFound) return NotFound();
+                if (result.Status == ResultStatus.Conflict) return Conflict(result.Errors);
+            }
+
+            return CreatedAtAction(nameof(GetBook), new { id = result.Value.Id }, result.Value);
+        }
+
+        // POST: api/Books/{id}/borrow
+        [HttpPost("{id}/return")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<BookDto>> ReturnBook(Guid id)
+        {
+            var result = await _bookService.ReturnBook(id);
+            if (!result.IsSuccess)
+            {
+                if (result.Status == ResultStatus.NotFound) return NotFound();
+                if (result.Status == ResultStatus.Invalid) return BadRequest(result.Errors);
+            }
+
+            return CreatedAtAction(nameof(GetBook), new { id = result.Value.Id }, result.Value);
+        }
+
         // POST: api/Books
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]

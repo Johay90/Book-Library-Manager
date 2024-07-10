@@ -60,12 +60,5 @@ namespace Book_Library_Manager.Data.Repositories
             await _context.SaveChangesAsync();
             return book;
         }
-
-        public async Task<Book> UpdateBookProgress(Book book)
-        {
-            _context.Entry(book).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return book;
-        }
     }
 }

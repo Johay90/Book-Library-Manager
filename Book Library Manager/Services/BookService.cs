@@ -38,9 +38,26 @@ namespace Book_Library_Manager.Services
             return Result.Success(addedBookDto);
         }
 
-        public Task<Result<BookDto>> CheckOutBook(Guid id, string borrower)
+        public async Task<Result<BookDto>> CheckOutBook(Guid id, BorrowBookDto borrowDto)
         {
-            throw new NotImplementedException();
+            var book = await _bookRepository.GetBookById(id);
+
+            if (book is null)
+            {
+                return Result.NotFound();
+            }
+
+            if (!string.IsNullOrEmpty(book.BorrowedBy))
+            {
+                return Result.Conflict("This book is currently borrowed by someone else.");
+            }
+
+            book.BorrowedBy = borrowDto.Borrower;
+            book.BorrowDate = DateTime.UtcNow;
+
+            await _bookRepository.UpdateBook(book);
+
+            return Result.Success(_mapper.Map<BookDto>(book));
         }
 
         public async Task<Result> DeleteBook(Guid Id)
@@ -86,9 +103,31 @@ namespace Book_Library_Manager.Services
             }
         }
 
-        public Task<Result<IEnumerable<BookDto>>> ReturnBook(Guid id)
+        public async Task<Result<BookDto>> ReturnBook(Guid id)
         {
-            throw new NotImplementedException();
+            var book = await _bookRepository.GetBookById(id);
+
+            if (book is null)
+            {
+                return Result.NotFound();
+            }
+
+            if (string.IsNullOrEmpty(book.BorrowedBy))
+            {
+                return Result.Invalid(new ValidationError
+                {
+                    ErrorMessage = "This book is not currently been borrowed",
+                    ErrorCode = "400BadRequest"
+                });
+            }
+
+            book.BorrowedBy = String.Empty;
+            book.BorrowDate = null;
+            book.ReadingProgress = 0;
+
+            await _bookRepository.UpdateBook(book);
+
+            return Result.Success(_mapper.Map<BookDto>(book));
         }
 
         public async Task<Result<IEnumerable<BookDto>>> SearchBooks(string query)
@@ -141,7 +180,7 @@ namespace Book_Library_Manager.Services
 
             existingBook.ReadingProgress = progress;
 
-            await _bookRepository.UpdateBookProgress(existingBook);
+            await _bookRepository.UpdateBook(existingBook);
 
             var updatedBookDto = _mapper.Map<BookDto>(existingBook);
 
