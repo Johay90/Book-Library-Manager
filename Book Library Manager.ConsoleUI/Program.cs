@@ -1,2 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using Book_Library_Manager.ConsoleUI.Core;
+
+var app = new App();
+await app.Run();

@@ -6,14 +6,17 @@ using Book_Library_Manager.Data.Repositories;
 using Book_Library_Manager.Interfaces;
 using Book_Library_Manager.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -25,24 +28,27 @@ builder.Services.AddScoped<IValidator<BookDto>, BookValidator>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<BookLibraryManagerContext>("database");
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Books API", Version = "v1" });
+
+    c.CustomOperationIds(apiDesc =>
+    {
+        return apiDesc.TryGetMethodInfo(out MethodInfo methodInfo)
+            ? methodInfo.Name
+            : null;
+    });
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    builder.Services.AddSwaggerGen(c =>
-    {
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Books API", Version = "v1" });
-
-        c.CustomOperationIds(apiDesc =>
-        {
-            return apiDesc.TryGetMethodInfo(out MethodInfo methodInfo)
-                ? methodInfo.Name
-                : null;
-        });
-    });
 }
 
 app.UseHttpsRedirection();
@@ -50,5 +56,27 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            Status = report.Status.ToString(),
+            Checks = report.Entries.Select(e => new
+            {
+                Component = e.Key,
+                Status = e.Value.Status.ToString(),
+                Description = e.Value.Description
+            }),
+            TotalDuration = report.TotalDuration
+        };
+
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+    }
+});
 
 app.Run();
