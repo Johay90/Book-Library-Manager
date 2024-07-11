@@ -6,6 +6,9 @@ using Book_Library_Manager.Data.Repositories;
 using Book_Library_Manager.Interfaces;
 using Book_Library_Manager.Services;
 using FluentValidation;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +32,17 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Books API", Version = "v1" });
+
+        c.CustomOperationIds(apiDesc =>
+        {
+            return apiDesc.TryGetMethodInfo(out MethodInfo methodInfo)
+                ? methodInfo.Name
+                : null;
+        });
+    });
 }
 
 app.UseHttpsRedirection();

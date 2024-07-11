@@ -70,7 +70,7 @@ namespace Book_Library_Manager.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> PutBook(Guid id, [FromBody] UpdateBookDto book)
+        public async Task<IActionResult> UpdateBook(Guid id, [FromBody] UpdateBookDto book)
         {
             var result = await _bookService.UpdateBook(id, book);
 
@@ -149,7 +149,7 @@ namespace Book_Library_Manager.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<CreateBookDto>> PostBook([FromBody] CreateBookDto book)
+        public async Task<ActionResult<CreateBookDto>> AddBook([FromBody] CreateBookDto book)
         {
             var result = await _bookService.AddBook(book);
 
