@@ -1,4 +1,5 @@
-﻿using Book_Library_Manager.ConsoleUI.Enums;
+﻿using Ardalis.Result;
+using Book_Library_Manager.ConsoleUI.Enums;
 using Book_Library_Manager.ConsoleUI.Services;
 using Book_Library_Manager.ConsoleUI.UI;
 
@@ -25,6 +26,18 @@ public class App
             switch (option)
             {
                 case MenuOptions.ViewAllBooks:
+                    var allBooksResult = _service.GetAllBooks();
+
+                    if (allBooksResult.Result.IsSuccess)
+                    {
+                        Visualizer.OutputBooks(allBooksResult.Result.Value);
+                        UserInput.PressKeyToContinue();
+                    }
+                    else
+                    {
+                       
+                    }
+
                     break;
                 case MenuOptions.ViewBook:
                     break;

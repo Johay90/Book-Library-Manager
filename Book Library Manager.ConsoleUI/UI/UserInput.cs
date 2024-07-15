@@ -7,10 +7,18 @@ public static class UserInput
 {
     public static MenuOptions MenuSelection()
     {
-       return AnsiConsole.Prompt(
-            new SelectionPrompt<MenuOptions>()
-                .Title("Choose an menu option?")
-                .PageSize(10)
-                .AddChoices(Enum.GetValues<MenuOptions>()));
+        Visualizer.Header();
+        return AnsiConsole.Prompt(
+             new SelectionPrompt<MenuOptions>()
+                 .Title("Choose an menu option?")
+                 .PageSize(10)
+                 .AddChoices(Enum.GetValues<MenuOptions>()));
+    }
+
+    public static void PressKeyToContinue()
+    {
+        AnsiConsole.WriteLine();
+        AnsiConsole.WriteLine("Press any key to continue");
+        Console.ReadKey(true);
     }
 }
