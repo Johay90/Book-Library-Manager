@@ -91,11 +91,11 @@ namespace Book_Library_Manager.Services
 
         public async Task<Result<BookDto>> GetBookById(Guid Id)
         {
-            var books = _mapper.Map<BookDto>(await _bookRepository.GetBookById(Id));
+            var book = _mapper.Map<BookDto>(await _bookRepository.GetBookById(Id));
 
-            if (books is not null)
+            if (book is not null)
             {
-                return Result.Success(books).Value;
+                return Result.Success(book).Value;
             }
             else
             {

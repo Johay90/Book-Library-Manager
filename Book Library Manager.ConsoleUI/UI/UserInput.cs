@@ -15,6 +15,11 @@ public static class UserInput
                  .AddChoices(Enum.GetValues<MenuOptions>()));
     }
 
+    public static Guid GetId()
+    {
+        return AnsiConsole.Ask<Guid>("Type an Guid");
+    }
+
     public static void PressKeyToContinue()
     {
         AnsiConsole.WriteLine();

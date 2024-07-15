@@ -35,11 +35,28 @@ public class App
                     }
                     else
                     {
-                       
+                       Visualizer.Errors(allBooksResult.Result.Errors);
+                        UserInput.PressKeyToContinue();
                     }
 
                     break;
                 case MenuOptions.ViewBook:
+                    var bookId = UserInput.GetId();
+
+                    var bookResult = _service.GetBook(bookId);
+
+                    if (bookResult.Result.IsSuccess)
+                    {
+                        Visualizer.OutputBook(bookResult.Result.Value);
+                        UserInput.PressKeyToContinue();
+                    }
+                    else
+                    {
+                       Visualizer.Errors(bookResult.Result.Errors);
+                       UserInput.PressKeyToContinue();
+                    }
+
+
                     break;
                 case MenuOptions.SearchBooks:
                     break;

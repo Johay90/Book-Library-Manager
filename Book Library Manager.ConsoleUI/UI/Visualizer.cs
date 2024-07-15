@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using Ardalis.Result;
+using Spectre.Console;
 
 namespace Book_Library_Manager.ConsoleUI.UI;
 
@@ -56,6 +57,63 @@ public static class Visualizer
                 .BorderColor(Color.Cyan1)
                 .Padding(1, 1)
         );
+    }
+
+    public static void OutputBook(BookDto book)
+    {
+        Header();
+        var table = new Table()
+            .BorderColor(Color.Cyan1)
+            .Border(TableBorder.Rounded)
+            .Title("[cyan1]Book Collection[/]");
+
+        table.AddColumn(new TableColumn("[u]Title[/]").Width(30));
+        table.AddColumn(new TableColumn("[u]Author[/]").Width(20));
+        table.AddColumn(new TableColumn("[u]ISBN[/]").Width(15));
+        table.AddColumn(new TableColumn("[u]Year[/]").Width(6).Centered());
+        table.AddColumn(new TableColumn("[u]Genre[/]").Width(20));
+        table.AddColumn(new TableColumn("[u]Status[/]").Width(15));
+        table.AddColumn(new TableColumn("[u]Progress[/]").Width(10).Centered());
+
+
+        var status = book.BorrowedBy is not null
+            ? $"[yellow]Borrowed[/]\n{Truncate(book.BorrowedBy, 10)}\n{book.BorrowDate:d}"
+            : "[green]Available[/]";
+
+        var progress = book.ReadingProgress > 0
+            ? $"[blue]{book.ReadingProgress:F1}%[/]"
+            : "[gray]Not started[/]";
+
+        table.AddRow(
+            WrapText(Truncate(book.Title, 30), 30),
+            Truncate(book.Author, 20),
+            $"[dim]{book.Isbn}[/]",
+            book.PublicationYear.ToString(),
+            WrapText(Truncate(book.Genre, 20), 20),
+            status,
+            progress
+        );
+
+
+        AnsiConsole.Write(
+            new Panel(table)
+                .Header("Your Library")
+                .BorderColor(Color.Cyan1)
+                .Padding(1, 1)
+        );
+    }
+
+    public static void Errors(IEnumerable<string> errors)
+    {
+        Header();
+
+        Console.Beep();
+        AnsiConsole.MarkupLine("[red]Errors Occured:[/]");
+
+        foreach (var error in errors)
+        {
+            AnsiConsole.WriteLine($"{error}");
+        }
     }
 
     private static string Truncate(string value, int maxLength)

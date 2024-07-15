@@ -35,9 +35,9 @@ namespace Book_Library_Manager.Data.Repositories
             return await _context.Books.ToListAsync();
         }
 
-        public async Task<Book> GetBookById(Guid id)
+        public async Task<Book?> GetBookById(Guid id)
         {
-            return await _context.Books.FirstAsync(x => x.Id == id);
+            return await _context.Books.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<IEnumerable<Book>> SearchBooks(string query)
