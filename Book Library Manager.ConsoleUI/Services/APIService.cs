@@ -56,5 +56,26 @@ public class APIService
 
     }
 
+    public async Task<Result<ICollection<BookDto>>> Search(string query)
+    {
+        try
+        {
+            var result = await _client.SearchBooksAsync(query);
+
+            if (!result.Any())
+            {
+                return Result.NotFound();
+            }
+            else
+            {
+                return Result.Success(result);
+            }
+        }
+        catch (ApiException ex)
+        {
+            return Result.Error(ex.Message);
+        }
+    }
+
 
 }

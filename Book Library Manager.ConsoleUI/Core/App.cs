@@ -59,6 +59,20 @@ public class App
 
                     break;
                 case MenuOptions.SearchBooks:
+                    var searchString = UserInput.GetSearchQuery();
+                    var bookSearchResult = _service.Search(searchString);
+
+                    if (bookSearchResult.Result.IsSuccess)
+                    {
+                        Visualizer.OutputBooks(bookSearchResult.Result.Value);
+                        UserInput.PressKeyToContinue();
+                    }
+                    else
+                    {
+                       Visualizer.Errors(bookSearchResult.Result.Errors);
+                        UserInput.PressKeyToContinue();
+                    }
+
                     break;
                 case MenuOptions.AddBook:
                     break;

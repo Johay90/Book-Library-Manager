@@ -1,5 +1,6 @@
 ﻿using Book_Library_Manager.ConsoleUI.Enums;
 using Spectre.Console;
+using System.Net.NetworkInformation;
 
 namespace Book_Library_Manager.ConsoleUI.UI;
 
@@ -25,5 +26,10 @@ public static class UserInput
         AnsiConsole.WriteLine();
         AnsiConsole.WriteLine("Press any key to continue");
         Console.ReadKey(true);
+    }
+
+    public static string GetSearchQuery()
+    {
+        return AnsiConsole.Ask<string>("Type a search phrase for Author or Title:");
     }
 }
