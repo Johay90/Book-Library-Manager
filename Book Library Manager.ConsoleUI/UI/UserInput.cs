@@ -1,4 +1,5 @@
 ﻿using Book_Library_Manager.ConsoleUI.Enums;
+using Book_Library_Manager.Core.Models.DTOs;
 using Spectre.Console;
 using System.Net.NetworkInformation;
 
@@ -31,5 +32,16 @@ public static class UserInput
     public static string GetSearchQuery()
     {
         return AnsiConsole.Ask<string>("Type a search phrase for Author or Title:");
+    }
+
+    public static CreateBookDto AddBook()
+    {
+        var newBook = new CreateBookDto();
+        newBook.Title = AnsiConsole.Ask<string>("Title of book?");
+        newBook.Author = AnsiConsole.Ask<string>("Author of book?");
+        newBook.ISBN = AnsiConsole.Ask<string>("ISBN?");
+        newBook.PublicationYear = AnsiConsole.Ask<int>("Publication Year?");
+        newBook.Genre = AnsiConsole.Ask<string>("Genre?");
+        return newBook;
     }
 }

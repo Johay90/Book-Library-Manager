@@ -1,4 +1,5 @@
 ﻿using Ardalis.Result;
+using Book_Library_Manager.Core.Models.DTOs;
 using Spectre.Console;
 
 namespace Book_Library_Manager.ConsoleUI.UI;
@@ -43,7 +44,7 @@ public static class Visualizer
             table.AddRow(
                 WrapText(Truncate(book.Title, 30), 30),
                 Truncate(book.Author, 20),
-                $"[dim]{book.Isbn}[/]",
+                $"[dim]{book.ISBN}[/]",
                 book.PublicationYear.ToString(),
                 WrapText(Truncate(book.Genre, 20), 20),
                 status,
@@ -87,7 +88,7 @@ public static class Visualizer
         table.AddRow(
             WrapText(Truncate(book.Title, 30), 30),
             Truncate(book.Author, 20),
-            $"[dim]{book.Isbn}[/]",
+            $"[dim]{book.ISBN}[/]",
             book.PublicationYear.ToString(),
             WrapText(Truncate(book.Genre, 20), 20),
             status,

@@ -7,14 +7,14 @@ namespace Book_Library_Manager.ConsoleUI.Core;
 
 public class App
 {
-    private APIService _service;
+    private APIClient _client;
     private ConnectionHelper _connectionHelper;
     private bool _appRunning = true;
     private const string BASEURL = "https://localhost:7081";
 
     public App()
     {
-        _service = new APIService(BASEURL);
+        _client = new APIClient(BASEURL);
         _connectionHelper = new ConnectionHelper(BASEURL, 10);
     }
 
@@ -26,7 +26,7 @@ public class App
             switch (option)
             {
                 case MenuOptions.ViewAllBooks:
-                    var allBooksResult = _service.GetAllBooks();
+                    var allBooksResult = _client.GetBooksAsync();
 
                     if (allBooksResult.Result.IsSuccess)
                     {
@@ -35,7 +35,14 @@ public class App
                     }
                     else
                     {
-                       Visualizer.Errors(allBooksResult.Result.Errors);
+                        if (allBooksResult.Result.IsNotFound())
+                        {
+                            Visualizer.Errors(new[] { allBooksResult.Result.Errors.FirstOrDefault() ?? "No books found in the library." });
+                        }
+                        else
+                        {
+                            Visualizer.Errors(allBooksResult.Result.Errors);
+                        }
                         UserInput.PressKeyToContinue();
                     }
 
@@ -43,7 +50,7 @@ public class App
                 case MenuOptions.ViewBook:
                     var bookId = UserInput.GetId();
 
-                    var bookResult = _service.GetBook(bookId);
+                    var bookResult = _client.GetBookAsync(bookId);
 
                     if (bookResult.Result.IsSuccess)
                     {
@@ -52,15 +59,15 @@ public class App
                     }
                     else
                     {
-                       Visualizer.Errors(bookResult.Result.Errors);
-                       UserInput.PressKeyToContinue();
+                        Visualizer.Errors(bookResult.Result.Errors);
+                        UserInput.PressKeyToContinue();
                     }
 
 
                     break;
                 case MenuOptions.SearchBooks:
                     var searchString = UserInput.GetSearchQuery();
-                    var bookSearchResult = _service.Search(searchString);
+                    var bookSearchResult = _client.SearchBooksAsync(searchString);
 
                     if (bookSearchResult.Result.IsSuccess)
                     {
@@ -69,12 +76,32 @@ public class App
                     }
                     else
                     {
-                       Visualizer.Errors(bookSearchResult.Result.Errors);
+                        if (bookSearchResult.Result.IsNotFound())
+                        {
+                            Visualizer.Errors(new[] { bookSearchResult.Result.Errors.FirstOrDefault() ?? "No books found in the library." });
+                        }
+                        else
+                        {
+                            Visualizer.Errors(bookSearchResult.Result.Errors);
+                        }
                         UserInput.PressKeyToContinue();
                     }
 
                     break;
                 case MenuOptions.AddBook:
+                    var userBook = UserInput.AddBook();
+                    var addedBookResult = _client.AddBookAsync(userBook);
+
+                    if (addedBookResult.Result.IsSuccess)
+                    {
+                        UserInput.PressKeyToContinue();
+                    }
+                    else
+                    {
+                        Visualizer.Errors(addedBookResult.Result.Errors);
+                        UserInput.PressKeyToContinue();
+                    }
+
                     break;
                 case MenuOptions.UpdateBook:
                     break;
