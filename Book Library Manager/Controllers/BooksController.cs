@@ -155,7 +155,7 @@ namespace Book_Library_Manager.Controllers
 
             if (!result.IsSuccess)
             {
-                if (result.IsInvalid()) return BadRequest(result.Errors);
+                return BadRequest(result.ValidationErrors);
             }
 
             return CreatedAtAction(nameof(GetBook), new { id = result.Value.Id }, result.Value);

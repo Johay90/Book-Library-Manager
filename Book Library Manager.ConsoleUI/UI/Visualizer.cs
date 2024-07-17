@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using Book_Library_Manager.Core.Models.DTOs;
 using Spectre.Console;
+using System.Text.Json;
 
 namespace Book_Library_Manager.ConsoleUI.UI;
 
@@ -104,16 +105,42 @@ public static class Visualizer
         );
     }
 
-    public static void Errors(IEnumerable<string> errors)
+     public static void Errors<T>(IEnumerable<T> errors)
     {
         Header();
 
         Console.Beep();
-        AnsiConsole.MarkupLine("[red]Errors Occured:[/]");
+        AnsiConsole.MarkupLine("[red]Errors Occurred:[/]");
 
         foreach (var error in errors)
         {
-            AnsiConsole.WriteLine($"{error}");
+            if (error is ValidationError validationError)
+            {
+                AnsiConsole.WriteLine($"{validationError.ErrorMessage}");
+            }
+            else if (error is string errorString)
+            {
+                if (errorString.Contains("\"status\":404"))
+                {
+                    AnsiConsole.WriteLine("Not Found (404)");
+                }
+                else if (errorString.Contains("\"status\":400"))
+                {
+                    AnsiConsole.WriteLine("Bad Request (400)");
+                }
+                else if (errorString.Contains("\"status\":500"))
+                {
+                    AnsiConsole.WriteLine("Internal Server Error (500)");
+                }
+                else
+                {
+                    AnsiConsole.WriteLine($"{errorString}");
+                }
+            }
+            else
+            {
+                AnsiConsole.WriteLine($"{error}");
+            }
         }
     }
 

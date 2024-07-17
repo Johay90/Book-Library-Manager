@@ -20,8 +20,8 @@ public class APIClient
     {
         var response = await _httpClient.GetAsync("api/Books");
         var result = await HandleResponse<ICollection<BookDto>>(response);
-        return result.IsSuccess && !result.Value.Any() 
-            ? Result.NotFound("No books found in the library.") 
+        return result.IsSuccess && !result.Value.Any()
+            ? Result.NotFound("No books found in the library.")
             : result;
     }
 
@@ -35,8 +35,8 @@ public class APIClient
     {
         var response = await _httpClient.GetAsync($"api/Books/search?query={Uri.EscapeDataString(query)}");
         var result = await HandleResponse<ICollection<BookDto>>(response);
-        return result.IsSuccess && !result.Value.Any() 
-            ? Result.NotFound($"No books found matching the query: {query}") 
+        return result.IsSuccess && !result.Value.Any()
+            ? Result.NotFound($"No books found matching the query: {query}")
             : result;
     }
 
@@ -87,10 +87,29 @@ public class APIClient
             return result != null ? Result.Success(result) : Result.Error("Failed to deserialize response");
         }
 
-        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-            return Result.NotFound();
-
         var errorContent = await response.Content.ReadAsStringAsync();
-        return Result.Error($"API request failed. Status: {response.StatusCode}, Message: {errorContent}");
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return Result.NotFound(errorContent);
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            try
+            {
+                var errors = JsonSerializer.Deserialize<List<ValidationError>>(errorContent, _jsonOptions);
+                if (errors != null && errors.Any())
+                {
+                    return Result.Invalid(errors);
+                }
+            }
+            catch
+            {
+                // If we can't deserialize as validation errors, fall through to general error handling
+            }
+        }
+
+        return Result.Error(errorContent);
     }
 }

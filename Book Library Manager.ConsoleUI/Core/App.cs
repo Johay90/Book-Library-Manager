@@ -98,7 +98,7 @@ public class App
                     }
                     else
                     {
-                        Visualizer.Errors(addedBookResult.Result.Errors);
+                        Visualizer.Errors(addedBookResult.Result.ValidationErrors);
                         UserInput.PressKeyToContinue();
                     }
 
