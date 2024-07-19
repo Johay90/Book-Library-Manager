@@ -5,9 +5,7 @@ VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Book Library Manager.API", "Book Library Manager\Book Library Manager.API.csproj", "{D4F8B649-7C5E-4409-B2B9-77AB6D3B573F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Book Library Manager.Core", "Book Library Manager.Core\Book Library Manager.Core.csproj", "{739D780F-025E-4044-9BC4-466B98C5738E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Book Library Manager.ConsoleUI", "Book Library Manager.ConsoleUI\Book Library Manager.ConsoleUI.csproj", "{C982302E-A96C-4F2A-940F-F2E1FEDC1096}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Book Library Manager.Core", "Book Library Manager.Core\Book Library Manager.Core.csproj", "{739D780F-025E-4044-9BC4-466B98C5738E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{739D780F-025E-4044-9BC4-466B98C5738E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{739D780F-025E-4044-9BC4-466B98C5738E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{739D780F-025E-4044-9BC4-466B98C5738E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C982302E-A96C-4F2A-940F-F2E1FEDC1096}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C982302E-A96C-4F2A-940F-F2E1FEDC1096}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C982302E-A96C-4F2A-940F-F2E1FEDC1096}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C982302E-A96C-4F2A-940F-F2E1FEDC1096}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
